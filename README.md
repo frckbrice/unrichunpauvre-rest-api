@@ -86,7 +86,7 @@ With Mau, you can deploy your application in just a few clicks, allowing you to 
 
 ## Support
 
-unricheunpauvre is a private initiative.
+unricheunpauvre is a private initiative. It could be supported to help it grow in the purpose to help the majority of people in the need.
 
 ## Stay in touch
 
