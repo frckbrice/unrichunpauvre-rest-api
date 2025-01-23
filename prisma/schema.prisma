@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs https//pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate https//pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  nomUser      String
+  mdpUser      String
+  username     String
+  photoUser    String ?
+  localisation String ?
+  pieceIdf     String ?
+  pieceIdb     String ?
+  etatUser     Boolean       @default(false)
+  dateNaiss    String ?
+  likes        Likes[]
+  commentaires Commentaire[]
+  publications Publication[]
+  favorites    Favorite[]
+  donations    Donation[]
+  createdAt    DateTime      @default(now())
+  dateCrea     DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Publication {
+  id           String        @id @default(cuid())
+  idUser       String
+  idCat        String
+  libelePub    String
+  imagePub     String
+  user         User          @relation(fields: [idUser], references: [id])
+  etat         Boolean       @default(false)
+  likes        Likes[]
+  category     Category      @relation(fields: [idCat], references: [id])
+  commentaires Commentaire[]
+  favorites    Favorite[]
+  donations    Donation[]
+  datePub      DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Likes {
+  id        String      @id @default(cuid())
+  idPub     String
+  idUser    String
+  user      User        @relation(fields: [idUser], references: [id])
+  pub       Publication @relation(fields: [idPub], references: [id])
+  dateJaime DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  nomCat       String
+  typeCat      String?
+  publications Publication[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Commentaire {
+  id        String  @id @default(cuid())
+  idPub     String
+  idUser    String
+  libeleCom String
+  etatCom   Boolean @default(false)
+
+  // Self-referencing relationship
+  idParent      String?
+  parentComment Commentaire?  @relation("CommentReplies", fields: [idParent], references: [id])
+  replies       Commentaire[] @relation("CommentReplies")
+
+  user      User        @relation(fields: [idUser], references: [id])
+  pub       Publication @relation(fields: [idPub], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Favorite {
+  id        String      @id @default(cuid())
+  idPub     String
+  idUser    String
+  user      User        @relation(fields: [idUser], references: [id])
+  pub       Publication @relation(fields: [idPub], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Donation {
+  id          String      @id @default(cuid())
+  idPub       String
+  idUser      String
+  nomDons     String
+  montantDons Decimal
+  user        User        @relation(fields: [idUser], references: [id])
+  pub         Publication @relation(fields: [idPub], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
