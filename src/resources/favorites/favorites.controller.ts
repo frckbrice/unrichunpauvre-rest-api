@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { FavoriteService } from './favorites.service';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
-import { Favorite, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { FavoritePaginationParams } from 'src/global/utils/pagination';
 
 
@@ -26,7 +25,7 @@ export class FavoritesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFavoriteDto: UpdateFavoriteDto) {
+  update(@Param('id') id: string, @Body() updateFavoriteDto: Prisma.FavoriteUpdateInput) {
     return this.favoritesService.updateFavorite({ where: { id }, data: updateFavoriteDto });
   }
 
