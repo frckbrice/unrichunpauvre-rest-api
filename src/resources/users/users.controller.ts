@@ -22,6 +22,7 @@ import { Public } from '../../global/auth/public.decorator';
 
 @Controller('users')
 @ApiTags('users')
+@ApiTags('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -38,6 +39,9 @@ export class UserController {
 
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: UserEntity, isArray: true })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity, isArray: true })

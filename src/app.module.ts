@@ -46,6 +46,28 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
       }
     ]),
 
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    EventEmitterModule.forRoot(),
+    CacheModule.register({
+      ttl: 5, // seconds
+      // max: 10, // maximum number of items in cache
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 5, //TODO: reduce this and apply correct handling response
+      },
+      {
+        name: 'short',
+        limit: 1, // TODO: reduce this and apply correct handling response
+        ttl: 1000, // 1 minute
+      }
+    ]),
+
     AuthModule,
     CategoriesModule,
     UsersModule,
@@ -74,7 +96,8 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-  ],
+  ]
 })
+
 
 export class AppModule { }
