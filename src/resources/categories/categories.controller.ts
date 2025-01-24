@@ -12,19 +12,25 @@ import {
 import { CategoryService } from './categories.service';
 import { Prisma, Category as CategoryModel } from '@prisma/client';
 import { CategoriesPaginationParams } from 'src/global/utils/pagination';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { CategoryEntity } from './entities/category.entity';
 
-@Controller('category')
+
+@Controller('categories')
+@ApiTags('categories')
 export class CategoryController {
   constructor(
     private readonly categoryService: CategoryService,
   ) { }
 
   @Get(':id')
+  @ApiOkResponse({ type: CategoryEntity })
   async getCategoryById(@Param('id') id: string): Promise<CategoryModel | null> {
     return this.categoryService.findSingleCategory({ id });
   }
 
-  @Get('dreams')
+  @Get()
+  @ApiOkResponse({ type: CategoryEntity, isArray: true })
   async getPublishedCategory(
     @Query() params: CategoriesPaginationParams
   ): Promise<CategoryModel[]> {
@@ -34,6 +40,7 @@ export class CategoryController {
 
 
   @Post()
+  @ApiCreatedResponse({ type: CategoryEntity })
   async createlike(
     @Body() categoryData: Prisma.CategoryCreateInput,
   ): Promise<CategoryModel> {
@@ -41,6 +48,7 @@ export class CategoryController {
   }
 
   @Put(':id')
+  @ApiOkResponse({ type: CategoryEntity })
   async updateCategory(
     @Param('id') id: string,
     @Body() categoryData: Prisma.CategoryUpdateInput,
@@ -52,7 +60,8 @@ export class CategoryController {
   }
 
 
-  @Delete('category/:id')
+  @Delete(':id')
+  @ApiOkResponse({ type: CategoryEntity })
   async deleteCategory(@Param('id') id: string): Promise<CategoryModel> {
     const where = { id };
     return this.categoryService.deleteCategory(where);

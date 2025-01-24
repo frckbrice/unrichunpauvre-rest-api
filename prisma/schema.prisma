@@ -17,7 +17,7 @@ model User {
   id           String        @id @default(cuid())
   nomUser      String
   mdpUser      String
-  username     String
+  username     String        @unique
   photoUser    String ?
   localisation String ?
   pieceIdf     String ?
@@ -102,7 +102,7 @@ model Donation {
   id          String      @id @default(cuid())
   idPub       String
   idUser      String
-  nomDons     String
+  nomDons     String  ?
   montantDons Decimal
   user        User        @relation(fields: [idUser], references: [id])
   pub         Publication @relation(fields: [idPub], references: [id])
