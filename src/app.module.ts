@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './resources/auth/auth.module';
+import { AuthModule } from './global/auth/auth.module';
 import { CategoriesModule } from './resources/categories/categories.module';
 import { UsersModule } from './resources/users/users.module';
 import { DonationsModule } from './resources/donations/donations.module';
@@ -19,8 +19,7 @@ import { LoggerModule } from './global/logger/logger.module';
 import { MailModule } from './global/mail/mail.module';
 import { ShareModule } from './global/share/share.module';
 // import { AuthMiddleware } from './global/auth-security/middleware';
-import { RolesGuard } from './global/auth-security/guard';
-import { JwtAuthGuard } from './resources/auth/jwt-auth.guard';
+import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
 
 
 @Module({

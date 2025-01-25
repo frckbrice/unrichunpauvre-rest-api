@@ -10,6 +10,8 @@ const PORT = process.env.PORT ?? 5000;
 const dev_server_url = `${process.env.LOCAL_API_URL} `;
 const production_server_url = `${process.env.PROD_API_URL} `;
 
+const description = 'Une API NestJS conçue pour gérer une plateforme innovante de collecte de dons permettant aux utilisateurs de publier des reves et a d\'assurer la collecte des dons.';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
@@ -22,25 +24,25 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('unricheunpauvre api')
-    .setDescription('unricheunpauvre api documentation')
+    .setDescription(description)
     .setVersion('1.0')
     .addTag('unricheunpauvre-api')
     .addBearerAuth()
     .build();
 
-
   // override operationIdFactory to make it unique per method
-  const options: SwaggerDocumentOptions = {
-    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
-  };
+  // const options: SwaggerDocumentOptions = {
+  //   operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  // };
 
-  const document = SwaggerModule.createDocument(app, config, options);
-  SwaggerModule.setup('api', app, document, {
-    jsonDocumentUrl: 'swagger/json',
-    // useGlobalPrefix: true,
-    yamlDocumentUrl: 'swagger/yaml',
-  });
-
+  // const document = SwaggerModule.createDocument(app, config, options);
+  // SwaggerModule.setup('api', app, document, {
+  //   jsonDocumentUrl: 'swagger/json',
+  //   useGlobalPrefix: true,
+  //   yamlDocumentUrl: 'swagger/yaml',
+  // });
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   const environment = process.env.NODE_ENV || 'development';
 

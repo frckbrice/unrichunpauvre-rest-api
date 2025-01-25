@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class LikeEntity implements Prisma.LikesCreateInput {
+export class LikeEntity {
 
     @ApiProperty()
     idUser: string;
@@ -17,8 +17,5 @@ export class LikeEntity implements Prisma.LikesCreateInput {
     updatedAt?: string | Date | undefined;
     @ApiProperty()
     id?: string | undefined;
-    @ApiProperty()
-    pub: Prisma.PublicationCreateNestedOneWithoutDonationsInput;
-    @ApiProperty()
-    user: Prisma.UserCreateNestedOneWithoutDonationsInput;
+
 }

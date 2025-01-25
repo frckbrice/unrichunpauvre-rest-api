@@ -8,55 +8,66 @@ import {
   Put,
   Delete,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { PublicationService } from './publications.service';
 import { Prisma, Publication as PublicationsModel } from '@prisma/client';
 import { PublicationPaginationParams } from 'src/global/utils/pagination';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { PublicationEntity } from './entities/publicaion.entity';
 
 @Controller('publications')
+@ApiTags('publications')
 export class PublicaionsController {
   constructor(
     private readonly publicationService: PublicationService,
   ) { }
 
   @Get(':id')
-  async getPublicationsById(@Param('id') id: string): Promise<PublicationsModel | null> {
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: PublicationEntity })
+  async getPublicationsById(@Param('id') id: string) {
     return this.publicationService.findSinglePublication({ id });
   }
 
-  @Get('dreams')
+  @Get()
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: PublicationEntity, isArray: true })
   async getPublishedPublications(
     @Query() query: PublicationPaginationParams
-  ): Promise<PublicationsModel[]> {
+  ) {
 
-    const { skip, take, cursor, where, orderBy, searchString } = query;
-    if (searchString) {
-      return this.publicationService.findAllPublications({
-        where: {
-          OR: [
-            {
-              libelePub: { contains: searchString },
-            },
-          ],
-        },
-      });
-    }
-    return this.publicationService.findAllPublications({});
+    // return this.publicationService.findAllPublications({
+    //   where: {
+    //     OR: [
+    //       {
+    //         libelePub: { contains: searchString },
+    //       },
+    //     ],
+    //   },
+
+    // });
+
+    return this.publicationService.findAllPublications(query);
   }
 
 
   @Post()
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: PublicationEntity })
   async createPublication(
     @Body() publicationsData: Prisma.PublicationCreateInput,
-  ): Promise<PublicationsModel> {
+  ) {
     return this.publicationService.createPublication(publicationsData);
   }
 
-  @Put(':id')
+  @Patch(':id')
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: PublicationEntity })
   async updatePublications(
     @Param('id') id: string,
     @Body() publicationsData: Prisma.PublicationUpdateInput,
-  ): Promise<PublicationsModel> {
+  ) {
     return this.publicationService.updatePublication({
       where: { id },
       data: publicationsData,
@@ -64,8 +75,10 @@ export class PublicaionsController {
   }
 
 
-  @Delete('publications/:id')
-  async deletePublications(@Param('id') id: string): Promise<PublicationsModel> {
+  @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: PublicationEntity })
+  async deletePublications(@Param('id') id: string) {
     const where = { id };
     return this.publicationService.deletePublication(where);
   }

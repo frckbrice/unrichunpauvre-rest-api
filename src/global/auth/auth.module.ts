@@ -5,7 +5,7 @@ import { AuthController } from './auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from 'src/global/adapter/adapter.module';
-import { UsersModule } from '../users/users.module';
+import { UsersModule } from '../../resources/users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 
 export const jwtSecret = process.env.JWT_SECRETE;

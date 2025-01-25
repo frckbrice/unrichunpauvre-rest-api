@@ -15,7 +15,7 @@ export class AuthService {
 
   async login(username: string, password: string): Promise<AuthEntity> {
     // Step 1: Fetch a user with the given username
-    const user = await this.prisma.user.findUnique({ where: { username: username } });
+    const user = await this.prisma.user.findUnique({ where: { username } });
 
     // If no user is found, throw an error
     if (!user) {

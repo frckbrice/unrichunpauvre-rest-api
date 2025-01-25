@@ -15,10 +15,10 @@ import { UserService } from './users.service';
 import { Prisma, User as UserModel } from '@prisma/client';
 import { UserPaginationParams } from 'src/global/utils/pagination';
 import { ReturnApiType } from 'src/global/utils/return-type';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../global/auth/jwt-auth.guard';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags, ApiBearerAuth, } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { Public } from '../auth/public.decorator';
+import { Public } from '../../global/auth/public.decorator';
 
 @Controller('users')
 @ApiTags('users')
@@ -28,7 +28,7 @@ export class UserController {
   ) { }
 
   @Public() // explicitely set this method as public
-  @Post()
+  @Post('signup')
   @ApiCreatedResponse({ type: UserEntity })
   async signupUser(
     @Body() userData: Prisma.UserCreateInput,

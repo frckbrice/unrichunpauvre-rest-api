@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class DonationEntity implements Prisma.FavoriteCreateInput {
+export class FavoriteEntity implements Prisma.FavoriteCreateInput {
 
     @ApiProperty()
     idUser: string;

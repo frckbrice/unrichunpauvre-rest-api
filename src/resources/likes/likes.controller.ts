@@ -12,49 +12,62 @@ import {
 import { LikesService } from './likes.service';
 import { Prisma, Likes as LikesModel } from '@prisma/client';
 import { LikesPaginationParams } from 'src/global/utils/pagination';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { LikeEntity } from './entities/like.entity';
 
 @Controller('likes')
+@ApiTags('likes')
 export class LikesController {
   constructor(
     private readonly likeservice: LikesService,
   ) { }
 
   @Get(':id')
-  async getLikesById(@Param('id') id: string): Promise<LikesModel | null> {
-    return this.likeservice.findSingleLikes({ id });
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: LikeEntity })
+  async getLikesById(@Param('id') id: string) {
+    return this.likeservice.findSingleLike({ id });
   }
 
-  @Get('dreams')
+  @Get()
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: LikeEntity, isArray: true })
   async getPublishedLikes(
     @Query() params: LikesPaginationParams
-  ): Promise<LikesModel[]> {
+  ) {
 
     return this.likeservice.findAllLikes(params);
   }
 
 
   @Post()
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: LikeEntity })
   async createlike(
     @Body() likesData: Prisma.LikesCreateInput,
-  ): Promise<LikesModel> {
-    return this.likeservice.createLikes(likesData);
+  ) {
+    return this.likeservice.createLike(likesData);
   }
 
   @Put(':id')
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: LikeEntity })
   async updateLikes(
     @Param('id') id: string,
     @Body() likesData: Prisma.LikesUpdateInput,
-  ): Promise<LikesModel> {
-    return this.likeservice.updateLikes({
+  ) {
+    return this.likeservice.updateLike({
       where: { id },
       data: likesData,
     });
   }
 
 
-  @Delete('likes/:id')
-  async deleteLikes(@Param('id') id: string): Promise<LikesModel> {
+  @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: LikeEntity })
+  async deleteLikes(@Param('id') id: string) {
     const where = { id };
-    return this.likeservice.deleteLikes(where);
+    return this.likeservice.deleteLike(where);
   }
 }

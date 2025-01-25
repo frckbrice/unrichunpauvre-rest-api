@@ -52,10 +52,10 @@ export class UserService {
   }
 
   async findAllUsers(params: UserPaginationParams): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+    const { page, perPage, cursor, where, orderBy } = params;
     return this.prismaService.user.findMany({
-      skip,
-      take,
+      skip: (page ?? 0) * (perPage ?? 50 - 1),
+      take: (page ?? 50),
       cursor,
       where,
       orderBy,

@@ -1,13 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class PublicationEntity implements Prisma.PublicationCreateInput {
+export class PublicationEntity {
 
     @ApiProperty()
     idUser: string;
-
-    @ApiProperty()
-    idPub: string;
 
     @ApiProperty()
     category: Prisma.CategoryCreateNestedOneWithoutPublicationsInput;
@@ -35,8 +32,6 @@ export class PublicationEntity implements Prisma.PublicationCreateInput {
     updatedAt?: string | Date | undefined;
     @ApiProperty()
     id?: string | undefined;
-    @ApiProperty()
-    pub: Prisma.PublicationCreateNestedOneWithoutDonationsInput;
-    @ApiProperty()
-    user: Prisma.UserCreateNestedOneWithoutDonationsInput;
+
+
 }

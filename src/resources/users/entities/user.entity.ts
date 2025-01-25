@@ -1,34 +1,34 @@
 import { Exclude } from 'class-transformer';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { ApiProperty } from "@nestjs/swagger";
 
 
-export class UserEntity implements User {
+export class UserEntity implements Prisma.UserCreateInput {
     @ApiProperty()
-    createdAt: Date;
+    createdAt?: Date;
     @ApiProperty()
-    dateCrea: Date;
+    dateCrea?: Date;
     @ApiProperty()
-    dateNaiss: string | null;
+    dateNaiss?: string | null;
     @ApiProperty()
     etatUser: boolean;
     @ApiProperty()
-    id: string;
+    id?: string;
     @ApiProperty()
-    localisation: string | null;
+    localisation?: string | null;
     @ApiProperty()
     @Exclude()  // exclude the password from the return object.
     mdpUser: string;
     @ApiProperty()
     nomUser: string;
     @ApiProperty()
-    photoUser: string | null;
+    photoUser?: string | null;
     @ApiProperty()
-    pieceIdb: string | null;
+    pieceIdb?: string | null;
     @ApiProperty()
-    pieceIdf: string | null;
+    pieceIdf?: string | null;
     @ApiProperty()
-    updatedAt: Date;
+    updatedAt?: Date;
     @ApiProperty()
     username: string;
 }
