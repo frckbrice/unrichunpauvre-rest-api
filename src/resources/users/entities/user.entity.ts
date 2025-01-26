@@ -3,7 +3,7 @@ import { Prisma, User } from '@prisma/client';
 import { ApiProperty } from "@nestjs/swagger";
 
 
-export class UserEntity implements Prisma.UserCreateInput {
+export class UserEntity {
     @ApiProperty()
     createdAt?: Date;
     @ApiProperty()
@@ -16,7 +16,7 @@ export class UserEntity implements Prisma.UserCreateInput {
     id?: string;
     @ApiProperty()
     localisation?: string | null;
-    @ApiProperty()
+
     @Exclude()  // exclude the password from the return object.
     mdpUser: string;
     @ApiProperty()

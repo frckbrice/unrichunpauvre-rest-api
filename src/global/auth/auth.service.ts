@@ -13,9 +13,11 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) { }
 
-  async login(username: string, password: string): Promise<AuthEntity> {
+  async login(username: string, mdpUser: string): Promise<AuthEntity> {
     // Step 1: Fetch a user with the given username
-    const user = await this.prisma.user.findUnique({ where: { username } });
+    const user = await this.prisma.user.findUnique({
+      where: { username }
+    });
 
     // If no user is found, throw an error
     if (!user) {
@@ -23,7 +25,7 @@ export class AuthService {
     }
 
     // Step 2: Check if the password is correct
-    const isPasswordValid = await bcrypt.compare(password, user.mdpUser);
+    const isPasswordValid = await bcrypt.compare(mdpUser, user.mdpUser);
 
     // If password does not match, throw an error
     if (!isPasswordValid) {

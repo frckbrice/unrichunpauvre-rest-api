@@ -31,7 +31,7 @@ export class CommentaireService {
       } else
         return {
           status: 200,
-          message: 'la commentaire a ete trouvee',
+          message: 'la commentaire a ete trouvée',
           data: commentaire,
         };
     } catch (error) {
@@ -58,9 +58,10 @@ export class CommentaireService {
 
     const queryOptions = {
       where,
-      take: perPage ?? 20,
-      skip: (page ?? 0) * (perPage ?? 20 - 1),
-      cursor: cursor ?? undefined,
+      include: {
+        user: true,
+        publication: true,
+      },
       orderBy: orderBy ? orderBy : {
         createdAt: 'desc' as const,
       },
@@ -74,22 +75,22 @@ export class CommentaireService {
       if (typeof comments != 'undefined' && comments.length) {
         return {
           status: 200,
-          message: 'les commentaires ont ete recherchees avec succes!',
+          message: 'les commentaires ont ete recherchées avec succes!',
           data: comments,
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       } else {
         return {
           status: 400,
-          message: 'les commentaires n\'ont pas ete trouvees',
+          message: 'les commentaires n\'ont pas ete trouvés',
           data: [],
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       }
     } catch (error) {
@@ -98,11 +99,12 @@ export class CommentaireService {
         `Error while fetching comments \n\n ${error}`,
         CommentaireService.name,
       );
-      throw new InternalServerErrorException('Error durant la recherche des comments');
+      throw new InternalServerErrorException('Erreur durant la recherche des comments');
     }
   }
 
   async createCommentaire(data: Prisma.CommentaireCreateInput) {
+    console.log("\n\n incoming comment: ", data);
 
     try {
       const commentaire = await this.prismaService.commentaire.create({
@@ -111,13 +113,13 @@ export class CommentaireService {
       if (commentaire) {
         return {
           status: 201,
-          message: 'la commentaire a ete creee avec success',
+          message: 'le commentaire a ete crée avec success',
           data: commentaire,
         };
       } else {
         return {
           status: 400,
-          message: 'la commentaire n\'a pas ete creee',
+          message: 'le commentaire n\'a pas ete crée',
           data: null,
         };
       }
@@ -153,13 +155,13 @@ export class CommentaireService {
       if (commentaire) {
         return {
           status: 200,
-          message: 'la commentaire a ete modifiee avec success',
+          message: 'le commentaire a ete modifiée avec success',
           data: commentaire,
         };
       } else {
         return {
           status: 400,
-          message: 'la commentaire n\'a pas ete modifiee',
+          message: 'le commentaire n\'a pas ete modifiée',
           data: null,
         };
       }
@@ -170,7 +172,6 @@ export class CommentaireService {
       );
       throw new InternalServerErrorException('Error durant la modification de la commentaire');
     }
-
   }
 
   async deleteCommentaire(where: Prisma.CommentaireWhereUniqueInput) {
@@ -190,11 +191,10 @@ export class CommentaireService {
         })
         return {
           status: 200,
-          message: 'la commentaire a ete supprimee avec success',
+          message: 'le commentaire a ete supprimée avec success',
           data: deletedPub,
         };
       }
-
     } catch (error) {
       this.logger.error(
         `Error while deleting commentaire \n\n ${error}`,

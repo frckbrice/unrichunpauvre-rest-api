@@ -16,7 +16,8 @@ export class AuthController {
   @Public()  // explicitely set this route as public
   @Post('login')
   @ApiOkResponse({ type: AuthEntity })
-  login(@Body() { username, password }: LoginDto) {
-    return this.authService.login(username, password);
+  login(@Body() { username, mdpUser }: LoginDto) {
+    return this.authService.login(username, mdpUser);
   }
 }
+

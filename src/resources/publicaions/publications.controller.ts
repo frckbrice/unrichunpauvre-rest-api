@@ -5,19 +5,23 @@ import {
   Param,
   Post,
   Body,
-  Put,
+
   Delete,
   Query,
   Patch,
 } from '@nestjs/common';
 import { PublicationService } from './publications.service';
-import { Prisma, Publication as PublicationsModel } from '@prisma/client';
+import { Prisma, Publication, Publication as PublicationsModel } from '@prisma/client';
 import { PublicationPaginationParams } from 'src/global/utils/pagination';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PublicationEntity } from './entities/publicaion.entity';
+import { SkipThrottle } from '@nestjs/throttler';
 
+
+@SkipThrottle()
 @Controller('publications')
 @ApiTags('publications')
+
 export class PublicaionsController {
   constructor(
     private readonly publicationService: PublicationService,
@@ -30,6 +34,7 @@ export class PublicaionsController {
     return this.publicationService.findSinglePublication({ id });
   }
 
+  @SkipThrottle({ default: false })
   @Get()
   @ApiBearerAuth()
   @ApiOkResponse({ type: PublicationEntity, isArray: true })
@@ -37,26 +42,14 @@ export class PublicaionsController {
     @Query() query: PublicationPaginationParams
   ) {
 
-    // return this.publicationService.findAllPublications({
-    //   where: {
-    //     OR: [
-    //       {
-    //         libelePub: { contains: searchString },
-    //       },
-    //     ],
-    //   },
-
-    // });
-
     return this.publicationService.findAllPublications(query);
   }
-
 
   @Post()
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: PublicationEntity })
   async createPublication(
-    @Body() publicationsData: Prisma.PublicationCreateInput,
+    @Body() publicationsData: Publication,
   ) {
     return this.publicationService.createPublication(publicationsData);
   }

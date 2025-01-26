@@ -58,8 +58,8 @@ export class DonationService {
 
     const queryOptions = {
       where,
-      take: perPage ?? 20,
-      skip: (page ?? 0) * (perPage ?? 20 - 1),
+      take: Number(perPage) ?? 20,
+      skip: (Number(page) ?? 0) * (Number(perPage) ?? 20 - 1),
       cursor: cursor ?? undefined,
       orderBy: orderBy ? orderBy : {
         createdAt: 'desc' as const,
@@ -77,9 +77,9 @@ export class DonationService {
           message: 'les donations ont ete recherchees avec succes!',
           data: donations,
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       } else {
         return {
@@ -87,9 +87,9 @@ export class DonationService {
           message: 'les donations n\'ont pas ete trouvees',
           data: [],
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       }
     } catch (error) {

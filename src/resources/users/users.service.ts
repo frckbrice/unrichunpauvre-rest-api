@@ -51,15 +51,43 @@ export class UserService {
     }
   }
 
-  async findAllUsers(params: UserPaginationParams): Promise<User[]> {
-    const { page, perPage, cursor, where, orderBy } = params;
-    return this.prismaService.user.findMany({
-      skip: (page ?? 0) * (perPage ?? 50 - 1),
-      take: (page ?? 50),
-      cursor,
-      where,
-      orderBy,
-    });
+  async findAllUsers(params: UserPaginationParams) {
+    const { page, perPage, cursor, orderBy } = params;
+
+    try {
+      const [total, pubs] = await this.prismaService.$transaction([
+        this.prismaService.publication.count(),
+        this.prismaService.publication.findMany({}),
+      ]);
+      if (typeof pubs != 'undefined' && pubs.length) {
+        return {
+          status: 200,
+          message: 'les utilisateurs ont ete recherchees avec succes!',
+          data: pubs,
+          total,
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
+        };
+      }
+      return {
+        status: 400,
+        message: 'les utilisateurs n\'ont pas ete trouvees',
+        data: [],
+        total,
+        page: Number(page) || 0,
+        perPage: Number(perPage) ?? 20 - 1,
+        totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
+      };
+
+    } catch (error) {
+      this.logger.error(
+        `Error while fetching users \n\n ${error}`,
+        UserService.name,
+      );
+      throw new InternalServerErrorException('Erreur de recherche des utilisateurs');
+    }
+
   }
 
   async createUser(createUserDto: Prisma.UserCreateInput): Promise<ReturnApiType<User>> {
@@ -77,6 +105,8 @@ export class UserService {
       });
 
       if (newUser) {
+        console.log('\n\n newUser', newUser);
+
         // send message for company created in senwisetool system
         this.eventEmitter.emit(localEvents.userCreated, newUser);
         return {
@@ -121,12 +151,15 @@ export class UserService {
         data,
       });
 
-      if (updatedUser)
+      if (updatedUser) {
+        // send message for company created in senwisetool system
+        this.eventEmitter.emit(localEvents.userUpdated, updatedUser);
         return {
           status: 204,
           message: `L'utilisateur ${updatedUser.nomUser} a ete modifie avec success`,
           data: null,
         }
+      }
       else
         return {
           status: 400,
@@ -155,7 +188,7 @@ export class UserService {
       if (deletedUser)
         return {
           status: 204,
-          message: `L'utilisateur ${deletedUser.nomUser} a ete modifie avec success`,
+          message: `L'utilisateur ${deletedUser.nomUser} a ete supprime avec success`,
           data: null,
         }
       else

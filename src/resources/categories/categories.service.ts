@@ -47,25 +47,11 @@ export class CategoryService {
   }
 
   async findAllCategories(params: CategoriesPaginationParams) {
-    const { page, perPage, cursor, orderBy } = params;
-
-    const where = {};
-
-
-    const queryOptions = {
-      where,
-      take: perPage ?? 20,
-      skip: (page ?? 0) * (perPage ?? 20 - 1),
-      cursor: cursor ?? undefined,
-      orderBy: orderBy ? orderBy : {
-        createdAt: 'desc' as const,
-      },
-    };
 
     try {
       const [total, categories] = await this.prismaService.$transaction([
-        this.prismaService.category.count({ where }),
-        this.prismaService.category.findMany(queryOptions),
+        this.prismaService.category.count({}),
+        this.prismaService.category.findMany({}),
       ]);
       if (typeof categories != 'undefined' && categories.length) {
         return {
@@ -73,9 +59,6 @@ export class CategoryService {
           message: 'les category ont ete recherchees avec succes!',
           data: categories,
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
         };
       } else {
         return {
@@ -83,9 +66,6 @@ export class CategoryService {
           message: 'les category n\'ont pas ete trouvees',
           data: [],
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
         };
       }
     } catch (error) {

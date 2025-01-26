@@ -24,7 +24,8 @@ export class PublicationEntity {
     libelePub: string;
     @ApiProperty()
     likes?: Prisma.LikesCreateNestedManyWithoutPubInput | undefined;
-
+    @ApiProperty()
+    montantEstime?: number | undefined;
 
     @ApiProperty()
     createdAt?: string | Date | undefined;

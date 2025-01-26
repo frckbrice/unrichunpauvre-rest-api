@@ -32,7 +32,7 @@ export class MailServiceEvent {
     return this.mailerService
       .sendMail({
         to: toEmail, // list of receivers
-        from: 'noreply@sendwisetool.com', // sender address
+        from: 'noreply@unricheunpauvre.com', // sender address
         subject, // Subject line
         text, // plaintext body
         //  html: '<b>welcome</b>', // HTML body content

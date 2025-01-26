@@ -22,7 +22,6 @@ import { Public } from '../../global/auth/public.decorator';
 
 @Controller('users')
 @ApiTags('users')
-@ApiTags('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -36,7 +35,6 @@ export class UserController {
   ): Promise<ReturnApiType<UserModel>> {
     return this.userService.createUser(userData);
   }
-
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -69,8 +67,14 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
-  remove(@Param('id') id: string) {
-    return this.userService.deleteUser({ id });
+  remove(@Param('id') id: string, @Body() { username }: { username?: string }) {
+
+    const where = {};
+    if (username)
+      where['username'] = username;
+    else
+      where['id'] = id;
+    return this.userService.deleteUser(where as Prisma.UserWhereUniqueInput);
   }
 
 

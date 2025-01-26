@@ -20,6 +20,11 @@ export class PublicationService {
         where: {
           id
         },
+        include: {
+          user: true,
+          commentaires: true,
+          likes: true
+        }
       });
       if (!publication) {
         return {
@@ -30,7 +35,7 @@ export class PublicationService {
       } else
         return {
           status: 200,
-          message: 'la publication a ete trouvee',
+          message: 'la publication a ete trouvée',
           data: publication,
         };
     } catch (error) {
@@ -46,9 +51,11 @@ export class PublicationService {
   }
 
   async findAllPublications(params: PublicationPaginationParams) {
-    const { page, perPage, cursor, orderBy, searchString, etat } = params;
+    const { page, perPage, cursor, orderBy, searchString, etat, idCat, idUser } = params;
 
+    console.log("\n\n params: ", params);
     const where = {};
+    let take: number | undefined = undefined, skip: number | undefined = undefined;
     if (searchString) {
       where['libelePub'] = {
         contains: searchString,
@@ -57,13 +64,31 @@ export class PublicationService {
       };
     }
     if (etat) {
-      where['etat'] = etat
+      where['etat'] = etat;
     }
 
+    if (idUser)
+      where['idUser'] = idUser;
+
+    if (idCat)
+      where['idCat'] = idCat;
+
+    if (perPage && Number(perPage) > 10)
+      take = +perPage as number;
+    if (page && Number(page) > 0 && take)
+      skip = (+page - 1) * (+take - 1);
+
     const queryOptions = {
-      where,
-      take: perPage ?? 20,
-      skip: (page ?? 0) * (perPage ?? 20 - 1),
+      where: {
+        ...where,
+      },
+      include: {
+        likes: true,
+        commentaires: true,
+        user: true,
+      },
+      take,
+      skip,
       cursor,
       orderBy: orderBy ? orderBy : {
         datePub: 'desc' as const,
@@ -75,25 +100,26 @@ export class PublicationService {
         this.prismaService.publication.count({ where }),
         this.prismaService.publication.findMany(queryOptions),
       ]);
+      console.log("\n\n pubs: ", pubs);
       if (typeof pubs != 'undefined' && pubs.length) {
         return {
           status: 200,
-          message: 'les reves ont ete recherchees avec succes!',
+          message: 'les reves ont ete recherchées avec succes!',
           data: pubs,
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 10 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 10 - 1)),
         };
       } else {
         return {
           status: 400,
-          message: 'les reves n\'ont pas ete trouvees',
+          message: 'les reves n\'ont pas ete trouvées',
           data: [],
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 10 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 10 - 1)),
         };
       }
     } catch (error) {
@@ -106,22 +132,34 @@ export class PublicationService {
     }
   }
 
-  async createPublication(data: Prisma.PublicationCreateInput) {
+  async createPublication(data: Publication) {
+
+    // console.log("\n\n incoming data: ", data);
 
     try {
+      // In your Prisma service
       const publication = await this.prismaService.publication.create({
-        data,
-      });
+        data: {
+          imagePub: data.imagePub,
+          documentUrl: data.documentUrl,
+          datePub: new Date(data.datePub),
+          libelePub: data.libelePub,
+          etat: data.etat,
+          montantEstime: data.montantEstime,
+          idCat: data.idCat,
+          idUser: data.idUser
+        }
+      })
       if (publication) {
         return {
           status: 201,
-          message: 'la publication a ete creee avec success',
+          message: 'la publication a ete créee avec success',
           data: publication,
         };
       } else {
         return {
           status: 400,
-          message: 'la publication n\'a pas ete creee',
+          message: 'Erreur, la publication n\'a pas ete créee',
           data: null,
         };
       }
@@ -157,13 +195,13 @@ export class PublicationService {
       if (publication) {
         return {
           status: 200,
-          message: 'la publication a ete modifiee avec success',
+          message: 'la publication a ete modifiée avec success',
           data: publication,
         };
       } else {
         return {
           status: 400,
-          message: 'la publication n\'a pas ete modifiee',
+          message: 'la publication n\'a pas ete modifiée',
           data: null,
         };
       }
@@ -194,7 +232,7 @@ export class PublicationService {
         })
         return {
           status: 200,
-          message: 'la publication a ete supprimee avec success',
+          message: 'la publication a ete supprimée avec success',
           data: deletedPub,
         };
       }

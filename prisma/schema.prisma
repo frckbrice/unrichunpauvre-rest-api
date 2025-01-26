@@ -36,14 +36,16 @@ model User {
 
 model Publication {
   id           String        @id @default(cuid())
-  idUser       String
+  idUser       String   // the author of the publication
   idCat        String
   libelePub    String
   imagePub     String
-  user         User          @relation(fields: [idUser], references: [id])
+  documentUrl  String     ?
+  montantEstime Float
+  user         User       ?   @relation(fields: [idUser], references: [id])
   etat         Boolean       @default(false)
   likes        Likes[]
-  category     Category      @relation(fields: [idCat], references: [id])
+  category     Category   ?   @relation(fields: [idCat], references: [id])
   commentaires Commentaire[]
   favorites    Favorite[]
   donations    Donation[]
@@ -55,8 +57,8 @@ model Likes {
   id        String      @id @default(cuid())
   idPub     String
   idUser    String
-  user      User        @relation(fields: [idUser], references: [id])
-  pub       Publication @relation(fields: [idPub], references: [id])
+  user      User        ? @relation(fields: [idUser], references: [id])
+  pub       Publication ? @relation(fields: [idPub], references: [id])
   dateJaime DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -76,14 +78,15 @@ model Commentaire {
   idUser    String
   libeleCom String
   etatCom   Boolean @default(false)
+  likes     Int ?
 
   // Self-referencing relationship
   idParent      String?
-  parentComment Commentaire?  @relation("CommentReplies", fields: [idParent], references: [id])
+  parentComment Commentaire ?  @relation("CommentReplies", fields: [idParent], references: [id])
   replies       Commentaire[] @relation("CommentReplies")
 
-  user      User        @relation(fields: [idUser], references: [id])
-  pub       Publication @relation(fields: [idPub], references: [id])
+  user      User       ? @relation(fields: [idUser], references: [id])
+  pub       Publication ? @relation(fields: [idPub], references: [id])
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -92,8 +95,8 @@ model Favorite {
   id        String      @id @default(cuid())
   idPub     String
   idUser    String
-  user      User        @relation(fields: [idUser], references: [id])
-  pub       Publication @relation(fields: [idPub], references: [id])
+  user      User      ?  @relation(fields: [idUser], references: [id])
+  pub       Publication ? @relation(fields: [idPub], references: [id])
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -104,8 +107,8 @@ model Donation {
   idUser      String
   nomDons     String  ?
   montantDons Decimal
-  user        User        @relation(fields: [idUser], references: [id])
-  pub         Publication @relation(fields: [idPub], references: [id])
+  user        User     ?   @relation(fields: [idUser], references: [id])
+  pub         Publication ? @relation(fields: [idPub], references: [id])
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }

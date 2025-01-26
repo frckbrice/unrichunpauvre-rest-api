@@ -58,9 +58,6 @@ export class FavoriteService {
 
     const queryOptions = {
       where,
-      take: perPage ?? 20,
-      skip: (page ?? 0) * (perPage ?? 20 - 1),
-      cursor: cursor ?? undefined,
       orderBy: orderBy ? orderBy : {
         createdAt: 'desc' as const,
       },
@@ -74,26 +71,25 @@ export class FavoriteService {
       if (typeof favorites != 'undefined' && favorites.length) {
         return {
           status: 200,
-          message: 'les favorites ont ete recherchees avec succes!',
+          message: 'les favoris ont ete recherchees avec succes!',
           data: favorites,
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       } else {
         return {
           status: 400,
-          message: 'les favorites n\'ont pas ete trouvees',
+          message: 'les favoris n\'ont pas ete trouvees',
           data: [],
           total,
-          page: page ?? 0,
-          perPage: perPage ?? 20 - 1,
-          totalPages: Math.ceil(total / (perPage ?? 20 - 1)),
+          page: Number(page) || 0,
+          perPage: Number(perPage) ?? 20 - 1,
+          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
         };
       }
     } catch (error) {
-
       this.logger.error(
         `Error while fetching favorites \n\n ${error}`,
         FavoriteService.name,
