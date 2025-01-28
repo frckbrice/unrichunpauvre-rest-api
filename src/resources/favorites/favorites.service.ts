@@ -166,8 +166,8 @@ export class FavoriteService {
       );
       throw new InternalServerErrorException('Error durant la modification de la favorite');
     }
-
   }
+
 
   async deleteFavorite(where: Prisma.FavoriteWhereUniqueInput) {
     try {
@@ -190,7 +190,6 @@ export class FavoriteService {
           data: deletedPub,
         };
       }
-
     } catch (error) {
       this.logger.error(
         `Error while deleting favorite \n\n ${error}`,

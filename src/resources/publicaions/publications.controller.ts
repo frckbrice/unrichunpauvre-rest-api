@@ -9,6 +9,7 @@ import {
   Delete,
   Query,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { PublicationService } from './publications.service';
 import { Prisma, Publication, Publication as PublicationsModel } from '@prisma/client';
@@ -54,7 +55,7 @@ export class PublicaionsController {
     return this.publicationService.createPublication(publicationsData);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: PublicationEntity })
   async updatePublications(

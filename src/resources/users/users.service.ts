@@ -56,8 +56,8 @@ export class UserService {
 
     try {
       const [total, pubs] = await this.prismaService.$transaction([
-        this.prismaService.publication.count(),
-        this.prismaService.publication.findMany({}),
+        this.prismaService.user.count(),
+        this.prismaService.user.findMany({}),
       ]);
       if (typeof pubs != 'undefined' && pubs.length) {
         return {
@@ -132,7 +132,6 @@ export class UserService {
         `Erreur de creation de l\'utilisateur ` + createUserDto.nomUser,
       );
     }
-
   }
 
   async updateUser(params: {
@@ -140,7 +139,18 @@ export class UserService {
     data: Prisma.UserUpdateInput;
   }): Promise<ReturnApiType<User | null>> {
     const { where, data } = params;
+
+    console.log('\n\n params', data);
     try {
+
+
+
+      // check for existing user first
+      const existingUser = await this.prismaService.user.findUnique({
+        where,
+      })
+      if (!existingUser)
+        throw new Error(`L'utilisateur d'identifiant ${where?.id} n'existe pas.`);
 
       if (data.mdpUser) {
         data.mdpUser = await bcrypt.hash(data.mdpUser as string, roundsOfHashing);
@@ -148,7 +158,19 @@ export class UserService {
 
       const updatedUser = await this.prismaService.user.update({
         where,
-        data,
+        data: {
+          ...data,
+          nomUser: data?.nomUser,
+          username: data?.username,
+          localisation: data?.localisation,
+          pieceIdf: data?.pieceIdf ?? undefined,
+          pieceIdb: data?.pieceIdb ?? undefined,
+          etatUser: data?.etatUser,
+          dateNaiss: data?.dateNaiss,
+          photoUser: data?.photoUser ?? undefined,
+          mdpUser: data?.mdpUser,
+          dateCrea: data?.dateCrea,
+        },
       });
 
       if (updatedUser) {
@@ -178,6 +200,70 @@ export class UserService {
     }
 
   }
+
+
+
+  async patchUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<ReturnApiType<User | null>> {
+    const { where, data } = params;
+
+    console.log('\n\n params', data);
+    try {
+
+      console.log("\n\n params: ", params);
+
+      // check for existing user first
+      const existingUser = await this.prismaService.user.findUnique({
+        where,
+      })
+      if (!existingUser)
+        throw new Error(`L'utilisateur d'identifiant ${where?.id} n'existe pas.`);
+
+      if (data.mdpUser) {
+        data.mdpUser = await bcrypt.hash(data.mdpUser as string, roundsOfHashing);
+      }
+
+      console.log("\n\n data: ", data);
+      const updatedUser = await this.prismaService.user.update({
+        where,
+        data: {
+          ...existingUser,
+          ...data,
+        },
+      });
+
+
+      if (updatedUser) {
+        console.log("\n\n new user: ", updatedUser);
+        // send message for company created in senwisetool system
+        this.eventEmitter.emit(localEvents.userUpdated, updatedUser);
+        return {
+          status: 204,
+          message: `L'utilisateur ${updatedUser.nomUser} a ete modifie avec success`,
+          data: null,
+        }
+      }
+      else
+        return {
+          status: 400,
+          message: `L'utilisateur ${data?.nomUser} n'a pas ete modifie`,
+          data: null,
+        }
+
+    } catch (error) {
+      this.logger.error(
+        `Error while updating user ${data.nomUser} \n\n ${error}`,
+        UserService.name,
+      );
+      throw new InternalServerErrorException(
+        `Erreur de modification de l\'utilisateur ` + data.nomUser,
+      );
+    }
+
+  }
+
 
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<ReturnApiType<User | null>> {
     try {

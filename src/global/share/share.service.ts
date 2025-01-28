@@ -120,11 +120,6 @@ export class ListenerService {
         `mail service event :error sending mail \n\n ${error}. resending email`,
         MailServiceEvent.name,
       );
-      while (this.counter < 4) {
-        this.updateRequestCurrentUserPayload(payload, req);
-        this.counter++;
-      }
-
     }
 
     this.counter = 1;

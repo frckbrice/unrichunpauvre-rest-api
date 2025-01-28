@@ -24,6 +24,9 @@ model User {
   pieceIdb     String ?
   etatUser     Boolean       @default(false)
   dateNaiss    String ?
+  telephone    String ?
+
+  
   likes        Likes[]
   commentaires Commentaire[]
   publications Publication[]

@@ -13,7 +13,7 @@ import { PrismaModule } from './global/adapter/adapter.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerModule } from './global/logger/logger.module';
 import { MailModule } from './global/mail/mail.module';
@@ -33,18 +33,7 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
       // max: 10, // maximum number of items in cache
       isGlobal: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        name: 'long',
-        ttl: 60000,
-        limit: 5, //TODO: reduce this and apply correct handling response
-      },
-      {
-        name: 'short',
-        limit: 1, // TODO: reduce this and apply correct handling response
-        ttl: 1000, // 1 minute
-      }
-    ]),
+
 
     ConfigModule.forRoot({
       isGlobal: true,
@@ -55,18 +44,18 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
       // max: 10, // maximum number of items in cache
       isGlobal: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        name: 'long',
-        ttl: 60000,
-        limit: 5, //TODO: reduce this and apply correct handling response
-      },
-      {
-        name: 'short',
-        limit: 1, // TODO: reduce this and apply correct handling response
-        ttl: 1000, // 1 minute
-      }
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     name: 'long',
+    //     ttl: 60000,
+    //     limit: 5, //TODO: reduce this and apply correct handling response
+    //   },
+    //   {
+    //     name: 'short',
+    //     limit: 1, // TODO: reduce this and apply correct handling response
+    //     ttl: 1000, // 1 minute
+    //   }
+    // ]),
 
     AuthModule,
     CategoriesModule,
@@ -92,10 +81,10 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor, // caching
     },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ]
 })
 

@@ -55,7 +55,7 @@ export class UserController {
     return this.userService.findSingleUser({ id });
   }
 
-  @Patch(':id')
+  @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: UserEntity })
@@ -63,18 +63,39 @@ export class UserController {
     return this.userService.updateUser({ where: { id }, data: updateUserDto });
   }
 
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: UserEntity })
+  patchUser(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+    return this.userService.patchUser({ where: { id }, data: updateUserDto });
+  }
+
+  // forgot password
+  @Public() // explicitely set this method as public
+  @Post('forgot-password')
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: UserEntity })
+  forgotPassword(@Body() updateUserDto: Prisma.UserUpdateInput) {
+    console.log("\n\n updateUserDto: ", updateUserDto);
+    return this.userService.patchUser({ where: { username: <string>updateUserDto.username }, data: updateUserDto });
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
-  remove(@Param('id') id: string, @Body() { username }: { username?: string }) {
+  remove(
+    @Param('id') id: string,
+    //  @Body() { username }: { username?: string }
+  ) {
 
-    const where = {};
-    if (username)
-      where['username'] = username;
-    else
-      where['id'] = id;
-    return this.userService.deleteUser(where as Prisma.UserWhereUniqueInput);
+    // const where = {};
+    // if (username)
+    //   where['username'] = username;
+    // else
+    //   where['id'] = id;
+    return this.userService.deleteUser({ id });
   }
 
 

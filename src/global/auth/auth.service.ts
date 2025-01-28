@@ -23,6 +23,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`No user found for username: ${username}`);
     }
+    console.log({ user, username, mdpUser });
 
     // Step 2: Check if the password is correct
     const isPasswordValid = await bcrypt.compare(mdpUser, user.mdpUser);
@@ -31,6 +32,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
     }
+
 
     // Step 3: Generate a JWT containing the user's ID and return it
     return {

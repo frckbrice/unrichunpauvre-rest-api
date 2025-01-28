@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
 import { CommentaireService } from './comments.service';
 import { Commentaire, Prisma } from '@prisma/client';
 import { CommentairePaginationParams } from 'src/global/utils/pagination';
@@ -14,7 +14,7 @@ export class CommentaireController {
   @Post()
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: CommentEntity })
-  create(@Body() createCommentaireDto: Prisma.CommentaireCreateInput) {
+  create(@Body() createCommentaireDto: Commentaire) {
     return this.commentairesService.createCommentaire(createCommentaireDto);
   }
 
@@ -32,7 +32,7 @@ export class CommentaireController {
     return this.commentairesService.findSingleCommentaire({ id });
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: CommentEntity })
   update(@Param('id') id: string, @Body() updateCommentaireDto: Prisma.CommentaireUpdateInput) {

@@ -60,7 +60,7 @@ export class CommentaireService {
       where,
       include: {
         user: true,
-        publication: true,
+        pub: true
       },
       orderBy: orderBy ? orderBy : {
         createdAt: 'desc' as const,
@@ -103,23 +103,38 @@ export class CommentaireService {
     }
   }
 
-  async createCommentaire(data: Prisma.CommentaireCreateInput) {
+  /**
+   * Crée un nouveau commentaire.
+   *
+   * @param {Commentaire} data les données du commentaire a créer
+   * @returns {Promise<ReturnApiType<Commentaire|null>>} un objet contenant le statut, le message et les données du commentaire crée
+   */
+  async createCommentaire(data: Commentaire) {
     console.log("\n\n incoming comment: ", data);
 
     try {
       const commentaire = await this.prismaService.commentaire.create({
-        data,
+        data: {
+          idPub: data?.idPub,
+          idUser: data?.idUser,
+          etatCom: data?.etatCom,
+          libeleCom: data?.libeleCom,
+          idParent: data?.idParent,
+          likes: data?.likes
+        },
       });
+
+
       if (commentaire) {
         return {
           status: 201,
-          message: 'le commentaire a ete crée avec success',
+          message: 'le commentaire a été crée avec success',
           data: commentaire,
         };
       } else {
         return {
           status: 400,
-          message: 'le commentaire n\'a pas ete crée',
+          message: 'le commentaire n\'a pas été crée',
           data: null,
         };
       }

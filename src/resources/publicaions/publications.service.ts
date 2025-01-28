@@ -60,7 +60,6 @@ export class PublicationService {
       where['libelePub'] = {
         contains: searchString,
         mode: 'insensitive',
-
       };
     }
     if (etat) {

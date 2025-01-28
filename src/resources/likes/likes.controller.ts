@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { Prisma, Likes as LikesModel } from '@prisma/client';
