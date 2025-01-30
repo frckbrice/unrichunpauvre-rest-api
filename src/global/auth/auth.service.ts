@@ -20,7 +20,7 @@ export class AuthService {
     });
 
     // If no user is found, throw an error
-    if (!user) {
+    if (typeof user !== 'undefined' && !user?.id) {
       throw new NotFoundException(`No user found for username: ${username}`);
     }
     console.log({ user, username, mdpUser });
