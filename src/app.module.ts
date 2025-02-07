@@ -5,7 +5,7 @@ import { AuthModule } from './global/auth/auth.module';
 import { CategoriesModule } from './resources/categories/categories.module';
 import { UsersModule } from './resources/users/users.module';
 import { DonationsModule } from './resources/donations/donations.module';
-import { PublicaionsModule } from './resources/publicaions/publications.module';
+import { PublicationModule } from './resources/publicaions/publications.module';
 import { LikesModule } from './resources/likes/likes.module';
 import { FavoritesModule } from './resources/favorites/favorites.module';
 import { CommentsModule } from './resources/comments/comments.module';
@@ -61,7 +61,7 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
     CategoriesModule,
     UsersModule,
     DonationsModule,
-    PublicaionsModule,
+    PublicationModule,
     LikesModule,
     FavoritesModule,
     CommentsModule,

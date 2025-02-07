@@ -1,5 +1,5 @@
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/global/adapter/prisma-service';
 import { User, Prisma } from '@prisma/client';
 import { UserPaginationParams } from 'src/global/utils/pagination';
@@ -93,6 +93,18 @@ export class UserService {
   async createUser(createUserDto: Prisma.UserCreateInput): Promise<ReturnApiType<User>> {
 
     try {
+
+      // check if this user already exists
+      const existingUser = await this.prismaService.user.findUnique({
+        where: {
+          username: createUserDto.username
+        }
+      });
+
+      if (existingUser) {
+        throw new BadRequestException(`L'utilisateur d'identifiant ${createUserDto.username} existe deja`);
+      }
+
       const hashedPassword = await bcrypt.hash(
         createUserDto.mdpUser,
         roundsOfHashing,
@@ -205,35 +217,44 @@ export class UserService {
 
   async patchUser(params: {
     where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
+    data: Prisma.UserUpdateInput & {
+      currentPasword: string;
+    };
+    user: User
   }): Promise<ReturnApiType<User | null>> {
     const { where, data } = params;
 
     console.log('\n\n params', data);
     try {
 
-      console.log("\n\n params: ", params);
-
       // check for existing user first
       const existingUser = await this.prismaService.user.findUnique({
         where,
       })
       if (!existingUser)
-        throw new Error(`L'utilisateur d'identifiant ${where?.id} n'existe pas.`);
+        throw new UnauthorizedException(`L'utilisateur d'identifiant ${where?.id} n'existe pas.`);
 
+      // verify the correspondance of the password to be sure that the user is authenticated
+      const passwordMatch = await bcrypt.compare(data.currentPasword as string, existingUser.mdpUser);
+
+      if (!passwordMatch)
+        throw new UnauthorizedException(`Le mot de passe fourni n'est pas le bon`);
+
+      // hash the new password if it exists
       if (data.mdpUser) {
         data.mdpUser = await bcrypt.hash(data.mdpUser as string, roundsOfHashing);
       }
 
       console.log("\n\n data: ", data);
+      // remove the current password sent to replace by the new one
+
       const updatedUser = await this.prismaService.user.update({
         where,
         data: {
           ...existingUser,
-          ...data,
+          mdpUser: data.mdpUser,
         },
       });
-
 
       if (updatedUser) {
         console.log("\n\n new user: ", updatedUser);
@@ -251,7 +272,6 @@ export class UserService {
           message: `L'utilisateur ${data?.nomUser} n'a pas ete modifie`,
           data: null,
         }
-
     } catch (error) {
       this.logger.error(
         `Error while updating user ${data.nomUser} \n\n ${error}`,
@@ -261,9 +281,7 @@ export class UserService {
         `Erreur de modification de l\'utilisateur ` + data.nomUser,
       );
     }
-
   }
-
 
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<ReturnApiType<User | null>> {
     try {
@@ -290,4 +308,74 @@ export class UserService {
       );
     }
   }
+
+  // hanler for forgot password
+  async forgotPassword(params: {
+    where: Prisma.UserWhereUniqueInput;
+  }) {
+    const { where } = params;
+
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where,
+      });
+
+
+      if (!user)
+        throw new UnauthorizedException(`L'utilisateur d'identifiant ${where?.username} n'existe pas.`);
+
+      // emit event to send email to the user
+      return this.eventEmitter.emit(localEvents.userPasswordReset, user);
+    } catch (error) {
+      this.logger.error(`Error during forgot password processing of user with username  ${where?.username} \n\n ${error}`, UserService.name);
+      throw new InternalServerErrorException(
+        `Erreur lors de la modification du mot de passe de l'utilisateur d'identifiant ${where?.username}`,
+      );
+    }
+  }
+
+  // handle after the user has filled the reset-password field on form
+  async resetPassword(token: string, newPassword: string, email: string) {
+    try {
+      // Ensure both token and new password are provided
+      if (!token || !newPassword) {
+        throw new BadRequestException('Missing token or password');
+      }
+
+      // Find a valid reset token (already filtering expired tokens)
+      const resetToken = await this.prismaService.resetPassword.findFirst({
+        where: {
+          token,
+          expiration: { gt: new Date() } // Ensures token is not expired
+        },
+      });
+
+      if (!resetToken) {
+        throw new NotFoundException('Invalid or expired token');
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Update user password
+      await this.prismaService.user.update({
+        where: { username: email },
+        data: { mdpUser: hashedPassword },
+      });
+
+      // Invalidate the reset token (to prevent reuse)
+      await this.prismaService.resetPassword.delete({
+        where: { id: resetToken.id },
+      });
+
+      return {
+        message: 'Password reset successful',
+        status: 200, // Use 200 to indicate success since you're returning a message
+      };
+    } catch (error) {
+      this.logger.error(`Error during reset password processing \n\n ${error}`, UserService.name);
+      throw new InternalServerErrorException('Error durant la modification du mot de passe');
+    }
+  }
+
 }

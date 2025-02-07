@@ -28,6 +28,7 @@ export class MailServiceEvent {
     toEmail,
     subject,
     text,
+    html
   }: Partial<MailOptions>): Promise<any> {
     return this.mailerService
       .sendMail({
@@ -35,7 +36,7 @@ export class MailServiceEvent {
         from: 'noreply@unricheunpauvre.com', // sender address
         subject, // Subject line
         text, // plaintext body
-        //  html: '<b>welcome</b>', // HTML body content
+        html, // HTML body content
       })
       .then((resp) => {
         this.logger.log(` mail sent to ${toEmail}`, MailServiceEvent.name);

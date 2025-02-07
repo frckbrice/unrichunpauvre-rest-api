@@ -9,6 +9,8 @@ import {
   Delete,
   Query,
   Patch,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { Prisma, Likes as LikesModel } from '@prisma/client';
@@ -70,5 +72,22 @@ export class LikesController {
   async deleteLikes(@Param('id') id: string) {
     const where = { id };
     return this.likeservice.deleteLike(where);
+  }
+
+  @Delete()
+  async deleteLike(@Query('idPub') idPub: string, @Query('idUser') idUser: string) {
+    if (!idPub || !idUser) {
+      throw new HttpException('Missing required query parameters', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      const deletedLike = await this.likeservice.deletesLike(idPub, idUser);
+      if (!deletedLike) {
+        throw new HttpException('Like not found', HttpStatus.NOT_FOUND);
+      }
+      return { message: 'Like successfully deleted', deletedLike };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

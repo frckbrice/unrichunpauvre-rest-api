@@ -20,10 +20,10 @@ export class AuthService {
     });
 
     // If no user is found, throw an error
-    if (typeof user !== 'undefined' && !user?.id) {
+    if (!user?.id) {
       throw new NotFoundException(`No user found for username: ${username}`);
     }
-    console.log({ user, username, mdpUser });
+    // console.log({ user, username, mdpUser });
 
     // Step 2: Check if the password is correct
     const isPasswordValid = await bcrypt.compare(mdpUser, user.mdpUser);
@@ -39,7 +39,8 @@ export class AuthService {
       accessToken: this.jwtService.sign({
         userId: user.id,
         username: user.username,
-        nomUser: user.nomUser
+        nomUser: user.nomUser,
+        // pseudo: user.pseudo
       }),
     };
   }

@@ -1,5 +1,5 @@
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/global/adapter/prisma-service';
 import { Likes, Prisma } from '@prisma/client';
 import { LikesPaginationParams } from 'src/global/utils/pagination';
@@ -198,6 +198,30 @@ export class LikesService {
         LikesService.name,
       );
       throw new InternalServerErrorException('Error durant la suppression de la likes');
+    }
+  }
+
+  // delte like with query params
+
+  async deletesLike(idPub: string, idUser: string) {
+    try {
+      const like = await this.prismaService.likes.findFirst({
+        where: { idPub, idUser },
+      });
+
+      if (!like) {
+        throw new NotFoundException('Like not found');
+      }
+
+      return await this.prismaService.likes.delete({
+        where: { id: like.id },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Error while deleting likes with query params \n\n ${error}`,
+        LikesService.name,
+      );
+      throw new InternalServerErrorException('Error durant la suppression d\'un likes');
     }
   }
 }

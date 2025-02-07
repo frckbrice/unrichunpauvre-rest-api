@@ -2,6 +2,9 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './global/filter/http-exception.filter';
 import { SwaggerModule, DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+
 
 import 'reflect-metadata';
 
@@ -13,7 +16,7 @@ const production_server_url = `${process.env.PROD_API_URL} `;
 const description = 'Une API NestJS conçue pour gérer une plateforme innovante de collecte de dons permettant aux utilisateurs de publier des reves et a d\'assurer la collecte des dons.';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
 
   // call the http adapter here
   const { httpAdapter } = app.get(HttpAdapterHost);
@@ -30,19 +33,14 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  // override operationIdFactory to make it unique per method
-  // const options: SwaggerDocumentOptions = {
-  //   operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
-  // };
+  // We told Express that the public directory will be used for storing static assets
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
 
-  // const document = SwaggerModule.createDocument(app, config, options);
-  // SwaggerModule.setup('api', app, document, {
-  //   jsonDocumentUrl: 'swagger/json',
-  //   useGlobalPrefix: true,
-  //   yamlDocumentUrl: 'swagger/yaml',
-  // });
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document);
 
   const environment = process.env.NODE_ENV || 'development';
 

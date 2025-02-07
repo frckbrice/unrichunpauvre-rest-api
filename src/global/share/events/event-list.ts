@@ -4,6 +4,7 @@ export const localEvents = {
     userCreated: 'user.created',
     userUpdated: 'user.updated',
     userDeleted: 'user.deleted',
+    userPasswordReset: 'user.forgot-password',
 
     // publication
     publicationCreated: 'publication.created',

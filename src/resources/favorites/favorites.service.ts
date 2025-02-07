@@ -1,16 +1,20 @@
 
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/global/adapter/prisma-service';
 import { Favorite, Prisma } from '@prisma/client';
 import { FavoritePaginationParams } from 'src/global/utils/pagination';
 import { ReturnApiType } from 'src/global/utils/return-type';
 import { LoggerService } from 'src/global/logger/logger.service';
+import { PublicationService } from '../publicaions/publications.service';
 
 
 @Injectable()
 export class FavoriteService {
   private readonly logger = new LoggerService(FavoriteService.name);
-  constructor(private prismaService: PrismaService) { }
+  constructor(
+    private prismaService: PrismaService,
+    private publicationService: PublicationService
+  ) { }
 
   async findSingleFavorite(
     { id }: { id: string }
@@ -47,56 +51,60 @@ export class FavoriteService {
   }
 
   async findAllFavorites(params: FavoritePaginationParams) {
-    const { page, perPage, cursor, orderBy, idPub, idUser, } = params;
+    const { page = 1, perPage = 20, cursor, orderBy, idPub, idUser } = params;
 
-    const where = {};
-
-    if (idPub)
-      where['idPub'] = idPub;
-    if (idUser)
-      where['idUser'] = idUser;
-
-    const queryOptions = {
-      where,
-      orderBy: orderBy ? orderBy : {
-        createdAt: 'desc' as const,
-      },
-    };
+    const where: any = {};
+    if (idPub) where.idPub = idPub;
+    if (idUser) where.idUser = idUser;
 
     try {
       const [total, favorites] = await this.prismaService.$transaction([
         this.prismaService.favorite.count({ where }),
-        this.prismaService.favorite.findMany(queryOptions),
+        this.prismaService.favorite.findMany({
+          where,
+          include: {
+            // user: true,  // Fetch full user details
+            pub: true,   // Fetch full publication details
+          },
+          take: Number(perPage),
+          skip: (Number(page) - 1) * Number(perPage),  // Apply pagination logic
+          // cursor: cursor ? { id: cursor } : undefined, // Ensure valid cursor format
+          orderBy: orderBy ? orderBy : { createdAt: 'desc' },
+        }),
       ]);
-      if (typeof favorites != 'undefined' && favorites.length) {
-        return {
-          status: 200,
-          message: 'les favoris ont ete recherchees avec succes!',
-          data: favorites,
-          total,
-          page: Number(page) || 0,
-          perPage: Number(perPage) ?? 20 - 1,
-          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
-        };
-      } else {
-        return {
-          status: 400,
-          message: 'les favoris n\'ont pas ete trouvees',
-          data: [],
-          total,
-          page: Number(page) || 0,
-          perPage: Number(perPage) ?? 20 - 1,
-          totalPages: Math.ceil(total / (Number(perPage) ?? 20 - 1)),
-        };
-      }
+
+
+
+      return {
+        status: favorites.length ? 200 : 400,
+        message: favorites.length
+          ? 'Les favoris ont été récupérés avec succès!'
+          : 'Aucun favori trouvé',
+        data: favorites?.map((favorite) => ({
+          ...favorite,
+          pub: {
+            ...favorite.pub,
+            idCat: favorite?.pub?.idCat,
+            authorId: favorite?.pub?.idUser,
+
+            datePub: favorite?.pub?.datePub.toISOString(),
+            id: favorite?.pub?.id,
+            imagePub: favorite?.pub?.imagePub,
+            content: favorite?.pub?.libelePub,
+          },
+        })),
+        total,
+        page: Number(page),
+        perPage: Number(perPage),
+        totalPages: Math.ceil(total / Number(perPage)),
+      };
     } catch (error) {
-      this.logger.error(
-        `Error while fetching favorites \n\n ${error}`,
-        FavoriteService.name,
-      );
-      throw new InternalServerErrorException('Error durant la recherche des favorites');
+      this.logger.error(`Error while fetching favorites: ${error}`, FavoriteService.name);
+      throw new InternalServerErrorException('Erreur lors de la récupération des favoris');
     }
   }
+
+
 
   async createFavorite(data: Prisma.FavoriteCreateInput) {
 
@@ -196,6 +204,30 @@ export class FavoriteService {
         FavoriteService.name,
       );
       throw new InternalServerErrorException('Error durant la suppression de la favorite');
+    }
+  }
+
+  // delte like with query params
+
+  async deletesfavorite(idPub: string, idUser: string) {
+    try {
+      const like = await this.prismaService.favorite.findFirst({
+        where: { idPub, idUser },
+      });
+
+      if (!like) {
+        throw new NotFoundException('Like not found');
+      }
+
+      return await this.prismaService.favorite.delete({
+        where: { id: like.id },
+      });
+    } catch (error) {
+      this.logger.error(
+        `Error while deleting likes with query params \n\n ${error}`,
+        FavoriteService.name,
+      );
+      throw new InternalServerErrorException('Error durant la suppression d\'un likes');
     }
   }
 }

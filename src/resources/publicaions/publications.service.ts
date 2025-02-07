@@ -50,6 +50,7 @@ export class PublicationService {
     }
   }
 
+
   async findAllPublications(params: PublicationPaginationParams) {
     const { page, perPage, cursor, orderBy, searchString, etat, idCat, idUser } = params;
 

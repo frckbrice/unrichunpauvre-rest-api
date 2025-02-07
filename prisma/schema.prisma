@@ -17,14 +17,15 @@ model User {
   id           String        @id @default(cuid())
   nomUser      String
   mdpUser      String
-  username     String        @unique
+  username     String        @unique  // user email 
   photoUser    String ?
   localisation String ?
   pieceIdf     String ?
   pieceIdb     String ?
   etatUser     Boolean       @default(false)
   dateNaiss    String ?
-  
+  telephone    String ?     
+  pseudo       String ?
 
   
   likes        Likes[]
@@ -34,6 +35,15 @@ model User {
   donations    Donation[]
   createdAt    DateTime      @default(now())
   dateCrea     DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model ResetPassword {
+  id           String        @id @default(cuid())
+  email        String
+  token        String        @unique
+  expiration   DateTime
+  createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
 
