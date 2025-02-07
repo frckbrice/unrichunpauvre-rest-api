@@ -1,0 +1,27 @@
+<html lang='fr'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Réinitialisation du mot de passe</title>
+    <style>
+      body { display: flex; justify-content: center; align-items: center;
+      height: 100vh; background: #f3f4f6; } .container { background: white;
+      padding: 2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0,
+      0.1); text-align: center; } h2 { color: #2d3748; margin-bottom: 1rem; } p
+      { color: #4a5568; margin-bottom: 1.5rem; } .success { color: green; }
+      .error { color: red; } .btn { display: inline-block; padding: 0.75rem
+      1.5rem; text-decoration: none; background: #667eea; color: white;
+      border-radius: 5px; font-weight: bold; } .btn:hover { background:
+      #5a67d8;* { margin: 0; padding: 0; box-sizing: border-box; font-family:
+      'Arial', sans-serif; } }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h2>Réinitialisation du mot de passe</h2>
+      <p class='{{statusClass}}'>{{message}}</p>
+      <p cclass='{{statusClass}}'>Retour à la connexion sur votre application
+        mobile</p>
+    </div>
+  </body>
+</html>

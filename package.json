@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run copy-views",
+    "copy-views": "copyfiles -u 1 src/views dist/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -41,6 +42,7 @@
     "cache-manager": "^6.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "copyfiles": "^2.4.1",
     "hbs": "^4.2.0",
     "nestjs-fetch": "^0.1.0",
     "passport": "^0.7.0",

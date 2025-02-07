@@ -11,6 +11,7 @@ export class AppController {
   @Public()
   @Get('reset-password')
   @Render('reset-password')
+
   getResetPasswordForm(@Query('token') token: string, @Query('email') email: string) {
     return { token, email }; // Pass token and email to the template
   }
@@ -18,6 +19,7 @@ export class AppController {
   // Route to handle form submission (POST request)
   @Public()
   @Post('reset-password')
+  @Render('reset-response') // Render the Handlebars response page
   async handleResetPassword(
     @Body('token') token: string,
     @Body('email') email: string,
@@ -26,23 +28,25 @@ export class AppController {
     @Res() res: Response,
   ) {
     if (password !== confirmPassword) {
-      return res.status(400).send('Pas de correspondance entre les deux mots de passe.');
+      // return res.status(400).send('Pas de correspondance entre les deux mots de passe.');
+      return {
+        statusClass: 'error',
+        message: 'Les mots de passe ne correspondent pas. Veuillez réessayer.',
+      };
     }
 
     const success = await this.appService.resetPassword(email, token, password);
 
     if (success) {
-      return res.send({
-        message: 'Mot de passe réinitialisé avec succès. Veuillez vous connecter.',
-        status: 200,
-        data: null
-      });
+      return {
+        statusClass: 'success',
+        message: 'Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
+      };
     } else {
-      return res.status(400).send({
-        message: 'Token non valide ou expiré.',
-        status: 400,
-        data: null
-      });
+      return {
+        statusClass: 'error',
+        message: 'Token invalide ou expiré. Veuillez demander un nouveau lien de réinitialisation.',
+      };
     }
   }
 }

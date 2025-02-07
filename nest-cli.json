@@ -2,6 +2,12 @@
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
+  "assets": [
+    {
+      "include": "views/**/*",
+      "outDir": "dist/views"
+    }
+  ],
   "compilerOptions": {
     "deleteOutDir": true,
     "plugins": [
