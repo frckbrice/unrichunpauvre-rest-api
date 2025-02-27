@@ -34,6 +34,10 @@ export class UserService {
           data: null,
         }
       }
+
+      // remove the pwd
+      delete (user as { mdpUser?: string }).mdpUser;
+
       return {
         status: 200,
         message: 'User found',

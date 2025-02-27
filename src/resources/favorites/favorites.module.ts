@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { FavoriteService } from './favorites.service';
 import { FavoritesController } from './favorites.controller';
-import { PublicationModule } from '../publicaions/publications.module';
+import { PublicationModule } from '../publications/publications.module';
 
 @Module({
   imports: [PublicationModule],

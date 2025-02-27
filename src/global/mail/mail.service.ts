@@ -43,7 +43,7 @@ export class MailServiceEvent {
         return resp.response;
       })
       .catch((err) => {
-        return this.logger.error(
+        this.logger.error(
           `mail service event :error sending mail \n\n ${err}`,
           MailServiceEvent.name,
         );

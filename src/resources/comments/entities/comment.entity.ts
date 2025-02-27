@@ -17,10 +17,12 @@ export class CommentEntity {
     @ApiProperty()
     libeleCom: string;
 
-    @ApiProperty()
-    isReplied?: boolean | undefined;
+
     @ApiProperty()
     replies?: Prisma.CommentaireCreateNestedManyWithoutParentCommentInput | undefined;
     idUser: string;
     idPub: string;
+
+    @ApiProperty()
+    likes?: number; // Add this line
 }

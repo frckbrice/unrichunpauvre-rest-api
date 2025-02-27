@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum UserRole {
+  ADMIN
+  USER
+}
 model User {
   id           String        @id @default(cuid())
   nomUser      String
@@ -26,7 +31,7 @@ model User {
   dateNaiss    String ?
   telephone    String ?     
   pseudo       String ?
-
+  role         UserRole ?  @default(USER)
   
   likes        Likes[]
   commentaires Commentaire[]

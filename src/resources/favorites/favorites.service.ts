@@ -5,7 +5,7 @@ import { Favorite, Prisma } from '@prisma/client';
 import { FavoritePaginationParams } from 'src/global/utils/pagination';
 import { ReturnApiType } from 'src/global/utils/return-type';
 import { LoggerService } from 'src/global/logger/logger.service';
-import { PublicationService } from '../publicaions/publications.service';
+import { PublicationService } from '../publications/publications.service';
 
 
 @Injectable()

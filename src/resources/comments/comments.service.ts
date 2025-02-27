@@ -6,6 +6,15 @@ import { CommentairePaginationParams } from 'src/global/utils/pagination';
 import { ReturnApiType } from 'src/global/utils/return-type';
 import { LoggerService } from 'src/global/logger/logger.service';
 import { localEvents } from 'src/global/share/events/event-list';
+import { CommentEntity } from './entities/comment.entity';
+import { DefaultArgs } from '@prisma/client/runtime/library';
+
+interface CommentaireInclude extends DefaultArgs {
+  user: boolean;
+  pub: boolean;
+  likes: boolean; // Add this line
+  replies: boolean;
+}
 
 @Injectable()
 export class CommentaireService {
@@ -21,6 +30,16 @@ export class CommentaireService {
         where: {
           id
         },
+        include: {
+          user: true,
+          pub: true,
+          replies: {
+            include: {
+              replies: true, // Nested replies (can go deeper if needed)
+            },
+          },
+        },
+
       });
       if (!commentaire) {
         return {
@@ -60,7 +79,13 @@ export class CommentaireService {
       where,
       include: {
         user: true,
-        pub: true
+        pub: true,
+        likes: true,
+        replies: {
+          include: {
+            replies: true, // Nested replies (can go deeper if needed)
+          },
+        },
       },
       orderBy: orderBy ? orderBy : {
         createdAt: 'desc' as const,
@@ -117,7 +142,6 @@ export class CommentaireService {
         data: {
           idPub: data?.idPub,
           idUser: data?.idUser,
-          etatCom: data?.etatCom,
           libeleCom: data?.libeleCom,
           idParent: data?.idParent,
           likes: data?.likes
@@ -149,12 +173,22 @@ export class CommentaireService {
 
   async updateCommentaire(params: {
     where: Prisma.CommentaireWhereUniqueInput;
-    data: Prisma.CommentaireUpdateInput;
+    data: Prisma.CommentaireUpdateInput &
+    {
+      idParent?: string,
+      idPub?: string
+    };
   }) {
     const { where, data } = params;
+    console.log("\n\n update comment: ", data);
     try {
+      // check if the comment to update exists
       const exitingPub = await this.prismaService.commentaire.findUnique({
-        where,
+        where: {
+          ...where,
+          idParent: data?.idParent ?? null,
+          idPub: <string>data?.idPub
+        },
       });
       if (!exitingPub)
         return {
@@ -165,7 +199,10 @@ export class CommentaireService {
 
       const commentaire = await this.prismaService.commentaire.update({
         where,
-        data,
+        data: {
+          ...exitingPub,
+          likes: <number>data?.likes + 1,
+        },
       });
       if (commentaire) {
         return {

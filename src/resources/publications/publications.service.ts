@@ -23,7 +23,8 @@ export class PublicationService {
         include: {
           user: true,
           commentaires: true,
-          likes: true
+          likes: true,
+          favorites: true
         }
       });
       if (!publication) {
@@ -86,6 +87,7 @@ export class PublicationService {
         likes: true,
         commentaires: true,
         user: true,
+        favorites: true
       },
       take,
       skip,

@@ -35,7 +35,11 @@ export class CommentaireController {
   @Put(':id')
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: CommentEntity })
-  update(@Param('id') id: string, @Body() updateCommentaireDto: Prisma.CommentaireUpdateInput) {
+  update(@Param('id') id: string, @Body() updateCommentaireDto: Prisma.CommentaireUpdateInput &
+  {
+    idParent?: string,
+    idPub?: string
+  }) {
     return this.commentairesService.updateCommentaire({ where: { id }, data: updateCommentaireDto });
   }
 

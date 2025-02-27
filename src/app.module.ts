@@ -5,7 +5,7 @@ import { AuthModule } from './global/auth/auth.module';
 import { CategoriesModule } from './resources/categories/categories.module';
 import { UsersModule } from './resources/users/users.module';
 import { DonationsModule } from './resources/donations/donations.module';
-import { PublicationModule } from './resources/publicaions/publications.module';
+import { PublicationModule } from './resources/publications/publications.module';
 import { LikesModule } from './resources/likes/likes.module';
 import { FavoritesModule } from './resources/favorites/favorites.module';
 import { CommentsModule } from './resources/comments/comments.module';
@@ -20,6 +20,7 @@ import { MailModule } from './global/mail/mail.module';
 import { ShareModule } from './global/share/share.module';
 // import { AuthMiddleware } from './global/auth-security/middleware';
 import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
+import { HealthModule } from './resources/health/health.module';
 
 
 @Module({
@@ -68,7 +69,8 @@ import { JwtAuthGuard } from './global/auth/jwt-auth.guard';
     PrismaModule,
     LoggerModule,
     MailModule,
-    ShareModule
+    ShareModule,
+    HealthModule
   ],
   controllers: [AppController],
   providers: [

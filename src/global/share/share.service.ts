@@ -51,21 +51,32 @@ export class ListenerService {
     try {
       const res = await this.sendMailService.senMail({
         toEmail: payload.email,
-        subject: `${payload.name} CONFIRMATION DE PAYMENT SUR LA PLATEFORME 1RICHE1PAUVRE ✔ `,
-        text: 'Merci pour votre generosite. Votre donation sera envoyee au destinataire.',
+        subject: `Paiement - 1	RICHE	1	PAUVRE ✔ `,
+        text: `
+        Bonjour,	${payload.nomUser}
+
+Votre	paiement	a	bien	été	enregistré.	Vous	venez	de	réaliser	un	rêve	et	nous	vous en	
+remercions.	
+
+Nous reviendrons	vers	vous,	avec	une	vidéo	prouvant	cette	réalisation.	
+
+Si	vous	avez	des	questions,	ou	si	vous	avez	besoin	d’aide,	n’hésitez	pas	à	nous	contacter	à	
+unricheunpauvre@gmail.com ou	à	consulter	notre	section	d’aide	dans	l’application.
+
+Merci	de	votre	fidélité	et	à	bientôt sur	1RICHE	1PAUVRE.	
+
+Cordialement	
+L’équipe	de	1RICHE	1	PAUVRE
+        `,
       });
     } catch (error) {
-      while (this.counter < 4) {
-        this.handleAccountCreated(payload);
-        this.counter++;
-      }
+      for (let i = 0; i < 4; i++)
+        this.handleUnsubscribePaymentLogic(payload);
       this.logger.error(
         `mail service event :error sending mail \n\n ${error}`,
         MailServiceEvent.name,
       );
     }
-
-    this.counter = 1;
   }
 
   // reinitialize the password
@@ -93,12 +104,16 @@ export class ListenerService {
       try {
         await this.sendMailService.senMail({
           toEmail: payload.username,
-          subject: 'REINITIALISATION DE VOTRE MOT DE PASSE SUR LA PLATEFORME 1Riche1Pauvre',
+          subject: '	Mise	à	jour	du	compte - 1	RICHE	1	PAUVRE ✔',
           // text: `Pour réinitialiser votre mot de passe, `,
-          html: `<p>Click sur le <a href="${resetLink}">lien</a> pour reinitialiser votre mot de passe</p>`,
+          html: `<p> Bonjour,	${payload.nomUser} 
+          Cliquez sur le lien <a href="${resetLink}">reinitialiser</a> pour reinitialiser votre mot de passe
+          </p>`,
 
         });
       } catch (error) {
+        for (let i = 0; i < 4; i++)
+          this.handleUpdatePassword(payload);
         this.logger.error(
           `mail service event :error resetting password \n\n ${error}`,
           MailServiceEvent.name,
@@ -106,12 +121,6 @@ export class ListenerService {
       }
     }
 
-    // step 2: send an email to the user to update the password
-
-    // step 3: send an email to the user to validate the password update
-
-
-    this.logger.log('handleupgradePaymentLogic', JSON.stringify(payload));
   }
 
   // company created
@@ -120,9 +129,22 @@ export class ListenerService {
     try {
       const res = await this.sendMailService.senMail({
         toEmail: payload.username,
-        subject: `${payload.nomUser} CONFIRMATION DE CREATION DE COMPTE SUR LA PLATEFORME 1RICHE1PAUVRE ✔ `,
-        text: `Merci pour votre inscription. Nous somme heureux de vous avoir 
-        dans la famille de ceux qui redonnent le sourire a ceux qui en ont le plus besoin.`,
+        subject: `Bienvenue	sur	1	RICHE	1	PAUVRE	 ✔ `,
+        text: `Bonjour,	${payload.nomUser}
+Merci	d’avoir	crée	un	compte	sur	1	RICHE	1	PAUVRE ! Nous	sommes	ravis	de	vous	accueillir	
+sur	l’application.
+Votre	compte	a	été	crée	avec	succès.	Vous	pouvez	maintenant décrire	et	poster	votre	rêve.	
+Pour	vous	connecter,	utilisez	les	informations	suivantes :
+- Adresse	email : ${payload?.username}
+- Mot	de	Passe : votre mot de passe a conserver au secret
+Si	vous	avez	des	questions,	ou	si	vous	avez	besoin	d’aide,	n’hésitez	pas	à	nous	contacter	à	
+unricheunpauvre@gmail.com ou	à	consulter	notre	section	d’aide	dans	l’application.
+
+Merci	encore	et	profitez	de	votre	expérience	sur	1RICHE	1	PAUVRE.	
+
+Cordialement	
+
+L’équipe	de	1RICHE	1	PAUVRE`,
       });
       if (res) {
         return;
@@ -147,8 +169,20 @@ export class ListenerService {
     try {
       const res = await this.sendMailService.senMail({
         toEmail: payload.username,
-        subject: `${payload.nomUser} CONFIRMATION DE MODIFICATION DE PROFILE SUR LA PLATEFORME 1RICHE1PAUVRE ✔ `,
-        text: 'Votre profile a ete mis a jour.',
+        subject: `Mise	à	jour	du	compte	1	RICHE	1	PAUVRE ✔ `,
+        text: `
+      Bonjour,	${payload?.nomUser}
+
+Nous	vous	informons	que	votre	compte	sur	1	RICHE	1	PAUVRE,	a	été	mis	à	jour	avec	succès !
+
+Si	vous	avez	des	questions,	ou	si	vous	avez	besoin	d’aide,	n’hésitez	pas	à	nous	contacter	à	
+unricheunpauvre@gmail.com ou	à	consulter	notre	section	d’aide	dans	l’application.	
+
+Merci	de	votre	fidélité	et	à	bientôt sur	1RICHE	1PAUVRE.	
+
+Cordialement	
+L’équipe	de	1RICHE	1	PAUVRE
+      `,
       });
     } catch (error) {
       this.logger.error(

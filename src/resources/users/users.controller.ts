@@ -33,7 +33,8 @@ export class UserController {
   @ApiCreatedResponse({ type: UserEntity })
   async signupUser(
     @Body() userData: Prisma.UserCreateInput,
-  ): Promise<ReturnApiType<UserModel>> {
+  ) {
+    // console.log("\n\n userData: ", userData);
     return this.userService.createUser(userData);
   }
 
