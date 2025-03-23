@@ -193,7 +193,7 @@ export class UserService {
           mdpUser: data?.mdpUser,
           dateCrea: data?.dateCrea,
           pseudo: data?.pseudo,
-          role: <UserRole>data?.role ?? "USER",
+          role: data?.role ?? undefined, // Handle nullable role
           telephone: data?.telephone ?? undefined,
         },
       });
