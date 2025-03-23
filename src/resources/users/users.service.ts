@@ -94,9 +94,11 @@ export class UserService {
 
   }
 
-  async createUser(createUserDto: Prisma.UserCreateInput): Promise<ReturnApiType<User>> {
+  async createUser(createUserDto: Prisma.UserCreateInput): Promise<ReturnApiType<User | null>> {
 
     try {
+
+      console.log('\n\n createUserDto', createUserDto);
 
       // check if this user already exists
       const existingUser = await this.prismaService.user.findUnique({
@@ -131,19 +133,23 @@ export class UserService {
           data: newUser,
         }
       }
-
-      else
-        return {
-          status: 400,
-          message: `L\'utilisateur ${createUserDto?.nomUser} n\'a pas ete cree`,
-          data: newUser,
-        }
+      return {
+        status: 400,
+        message: `L\'utilisateur ${createUserDto?.nomUser} n\'a pas ete cree`,
+        data: null,
+      }
 
     } catch (error) {
       this.logger.error(
         `Error while creating company ${createUserDto.nomUser} \n\n ${error}`,
         UserService.name,
       );
+
+      // Handle specific errors
+      if (error instanceof BadRequestException) {
+        // Return the BadRequestException message and status
+        throw error;
+      }
       throw new InternalServerErrorException(
         `Erreur de creation de l\'utilisateur ` + createUserDto.nomUser,
       );
@@ -186,6 +192,9 @@ export class UserService {
           photoUser: data?.photoUser ?? undefined,
           mdpUser: data?.mdpUser,
           dateCrea: data?.dateCrea,
+          pseudo: data?.pseudo,
+          role: data?.role ?? undefined,
+          telephone: data?.telephone ?? undefined,
         },
       });
 

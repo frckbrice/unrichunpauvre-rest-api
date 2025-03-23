@@ -46,6 +46,33 @@ export class LikesService {
     }
   }
 
+  async checkLike(userId: string, idPub: string) {
+    try {
+      const like = await this.prismaService.likes.findFirst({
+        where: { idUser: userId, idPub },
+      }); // Check if the user has liked the post
+      if (!like) {
+        return {
+          status: 404,
+          message: 'Like not found',
+          data: null,
+        };
+      } else {
+        return {
+          status: 200,
+          message: 'Like found',
+          data: like,
+        };
+      }
+    } catch (error) {
+      this.logger.error(
+        `Error while checking likes \n\n ${error}`, LikesService.name,
+      );
+      throw new InternalServerErrorException('Error durant la verification de la likes');
+    }
+  }
+
+
   async findAllLikes(params: LikesPaginationParams) {
     const { page, perPage, cursor, orderBy, idPub, idUser, } = params;
 

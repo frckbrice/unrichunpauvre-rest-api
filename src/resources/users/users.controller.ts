@@ -34,7 +34,7 @@ export class UserController {
   async signupUser(
     @Body() userData: Prisma.UserCreateInput,
   ) {
-    // console.log("\n\n userData: ", userData);
+
     return this.userService.createUser(userData);
   }
 

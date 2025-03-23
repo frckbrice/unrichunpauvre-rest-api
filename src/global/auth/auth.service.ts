@@ -19,7 +19,7 @@ export class AuthService {
       where: { username }
     });
 
-    console.log({ user, username, mdpUser });
+    // console.log({ user, username, mdpUser });
 
     // If no user is found, throw an error
     if (!user?.id) {
@@ -30,7 +30,7 @@ export class AuthService {
     // Step 2: Check if the password is correct
     const isPasswordValid = await bcrypt.compare(mdpUser, user.mdpUser);
 
-    console.log("after", isPasswordValid);
+    // console.log("after", isPasswordValid);
 
     // If password does not match, throw an error
     if (!isPasswordValid) {

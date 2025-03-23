@@ -92,6 +92,7 @@ export class CommentaireService {
       },
     };
 
+
     try {
       const [total, comments] = await this.prismaService.$transaction([
         this.prismaService.commentaire.count({ where }),

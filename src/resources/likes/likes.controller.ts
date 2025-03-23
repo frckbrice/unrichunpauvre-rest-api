@@ -38,8 +38,17 @@ export class LikesController {
   async getPublishedLikes(
     @Query() params: LikesPaginationParams
   ) {
-
     return this.likeservice.findAllLikes(params);
+  }
+
+  @Get('check/:userId/:postId')
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: LikeEntity })
+  async checkLike(
+    @Param('userId') userId: string,
+    @Param('postId') postId: string,
+  ) {
+    return this.likeservice.checkLike(userId, postId);
   }
 
 
