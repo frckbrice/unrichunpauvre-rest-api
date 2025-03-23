@@ -158,7 +158,7 @@ export class UserService {
 
   async updateUser(params: {
     where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
+    data: any;
   }): Promise<ReturnApiType<User | null>> {
     const { where, data } = params;
 
