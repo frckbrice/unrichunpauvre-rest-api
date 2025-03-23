@@ -165,12 +165,11 @@ export class UserService {
     console.log('\n\n params', data);
     try {
 
-
-
       // check for existing user first
       const existingUser = await this.prismaService.user.findUnique({
         where,
-      })
+      });
+
       if (!existingUser)
         throw new Error(`L'utilisateur d'identifiant ${where?.id} n'existe pas.`);
 
@@ -225,8 +224,6 @@ export class UserService {
     }
 
   }
-
-
 
   async patchUser(params: {
     where: Prisma.UserWhereUniqueInput;
