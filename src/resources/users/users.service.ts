@@ -1,7 +1,7 @@
 
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/global/adapter/prisma-service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, UserRole } from '@prisma/client';
 import { UserPaginationParams } from 'src/global/utils/pagination';
 import { LoggerService } from 'src/global/logger/logger.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -193,7 +193,7 @@ export class UserService {
           mdpUser: data?.mdpUser,
           dateCrea: data?.dateCrea,
           pseudo: data?.pseudo,
-          role: data?.role ?? undefined,
+          role: <UserRole>data?.role,
           telephone: data?.telephone ?? undefined,
         },
       });
